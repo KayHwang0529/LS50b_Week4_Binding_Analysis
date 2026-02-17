@@ -1,1 +1,4 @@
-#hello kate this is kay
+import numpy as np
+import matplotlib as plt
+
+print ("Hello")
