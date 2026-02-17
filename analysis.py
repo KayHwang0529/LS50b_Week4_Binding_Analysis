@@ -1,4 +1,6 @@
 import numpy as np
-import matplotlib as plt
+import matplotlib.pyplot as plt
+import pandas as pd
 
-print ("Hello")
+
+df = pd.read_csv('binding_data.csv')
