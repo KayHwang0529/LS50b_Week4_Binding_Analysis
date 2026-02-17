@@ -5,3 +5,5 @@ import pandas as pd
 
 
 df = pd.read_csv('VRC01_metadata.csv')
+
+print(df.head())
