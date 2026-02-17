@@ -1,0 +1,11 @@
+site,chain,imgt_position,region,germline_aa,mature_aa
+site_0,heavy,17,FR1,A,E
+site_1,heavy,39,FR2,M,L
+site_2,heavy,44,FR2,Q,L
+site_3,heavy,56,CDR2,I,L
+site_4,heavy,57,CDR2,N,K
+site_5,heavy,62,CDR2,S,G
+site_6,heavy,64,CDR2,G,A
+site_7,heavy,83,FR3,S,Y
+site_8,heavy,105,CDR3,A,T
+site_9,heavy,123,FR4,L,P
