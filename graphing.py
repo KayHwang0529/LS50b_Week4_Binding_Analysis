@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 from scipy import stats
-# Load data
+
+#1.2
+# Load dataå
 df = pd.read_csv('VRC01/VRC01_kds.csv')
 print(df.head())  # Display the first few rows of the dataframe to verify loading
 
@@ -15,6 +17,7 @@ df['n_germline'] = df['vh_aa'].apply(lambda x: x.count('G'))
 df_pivot = df.pivot_table(index='id', columns='replicate', values='nlog10_Kd', aggfunc='first')
 df_pivot.columns = [f'replicate_{int(col)}' for col in df_pivot.columns]
 
+#1.3b
 # Scatter plot of replicate 1 vs replicate 2
 plt.figure(figsize=(10, 8))
 sns.scatterplot(data=df_pivot, x='replicate_1', y='replicate_2', alpha=0.6)
@@ -24,25 +27,66 @@ plt.plot([df_pivot['replicate_1'].min(), df_pivot['replicate_1'].max()],
 plt.title('Scatter Plot of nlog10Kd: Replicate 1 vs Replicate 2')
 plt.xlabel('nlog10Kd Replicate 1')
 plt.ylabel('nlog10Kd Replicate 2')
-plt.xlim(df_pivot['replicate_1'].min(), df_pivot['replicate_1'].max())
-plt.ylim(df_pivot['replicate_2'].min(), df_pivot['replicate_2'].max())
-plt.grid(True)
 plt.show()
 
 # Compute Pearson and Spearman correlation coefficients
 pearson_corr, pearson_p = stats.pearsonr(df_pivot['replicate_1'].dropna(), df_pivot['replicate_2'].dropna())
 spearman_corr, spearman_p = stats.spearmanr(df_pivot['replicate_1'].dropna(), df_pivot['replicate_2'].dropna())
 
-print(f'Pearson correlation: {pearson_corr}, p-value: {pearson_p}')
-print(f'Spearman correlation: {spearman_corr}, p-value: {spearman_p}')
+# Replicate-replicate plots for each antigen with consistent axis ranges
+# Calculate global min and max across all antigens for consistent axis ranges
+all_replicate_values = []
+for antigen in df['antigen'].unique():
+    antigen_data = df[df['antigen'] == antigen]
+    antigen_pivot = antigen_data.pivot_table(index='id', columns='replicate', values='nlog10_Kd', aggfunc='first')
+    antigen_pivot.columns = [f'replicate_{int(col)}' for col in antigen_pivot.columns]
+    all_replicate_values.extend(antigen_pivot['replicate_1'].dropna().values)
+    all_replicate_values.extend(antigen_pivot['replicate_2'].dropna().values)
 
+global_min = np.nanmin(all_replicate_values)
+global_max = np.nanmax(all_replicate_values)
+
+# Create replicate-replicate plots for each antigen
+for antigen in df['antigen'].unique():
+    antigen_data = df[df['antigen'] == antigen]
+    antigen_pivot = antigen_data.pivot_table(index='id', columns='replicate', values='nlog10_Kd', aggfunc='first')
+    antigen_pivot.columns = [f'replicate_{int(col)}' for col in antigen_pivot.columns]
+    
+    plt.figure(figsize=(10, 8))
+    sns.scatterplot(data=antigen_pivot, x='replicate_1', y='replicate_2', alpha=0.6)
+    plt.plot([global_min, global_max], [global_min, global_max], color='red', linestyle='--')  # 1:1 line
+    plt.title(f'Scatter Plot of nlog10Kd: Replicate 1 vs Replicate 2 ({antigen})')
+    plt.xlabel('nlog10Kd Replicate 1')
+    plt.ylabel('nlog10Kd Replicate 2')
+    plt.show()
+    
+    # Compute correlations for each antigen
+    corr_data_r1 = antigen_pivot['replicate_1'].dropna()
+    corr_data_r2 = antigen_pivot['replicate_2'].dropna()
+    # Keep only overlapping indices
+    overlap_idx = corr_data_r1.index.intersection(corr_data_r2.index)
+    if len(overlap_idx) > 1:
+        pearson_corr_antigen, pearson_p_antigen = stats.pearsonr(corr_data_r1[overlap_idx], corr_data_r2[overlap_idx])
+        spearman_corr_antigen, spearman_p_antigen = stats.spearmanr(corr_data_r1[overlap_idx], corr_data_r2[overlap_idx])
+        print(f'{antigen} - Pearson correlation: {pearson_corr_antigen:.4f}, p-value: {pearson_p_antigen:.2e}')
+        print(f'{antigen} - Spearman correlation: {spearman_corr_antigen:.4f}, p-value: {spearman_p_antigen:.2e}')
+
+# Overall correlations
+pearson_corr, pearson_p = stats.pearsonr(df_pivot['replicate_1'].dropna(), df_pivot['replicate_2'].dropna())
+spearman_corr, spearman_p = stats.spearmanr(df_pivot['replicate_1'].dropna(), df_pivot['replicate_2'].dropna())
+
+print(f'Overall Pearson correlation: {pearson_corr:.4f}, p-value: {pearson_p:.2e}')
+print(f'Overall Spearman correlation: {spearman_corr:.4f}, p-value: {spearman_p:.2e}')
+
+#1.3c
 # Histograms of nlog10Kd
 plt.figure(figsize=(10, 8))
-sns.histplot(df['nlog10_Kd'], bins=30, kde=True, color='blue', alpha=0.6)
+sns.histplot(df['nlog10_Kd'], bins=30, kde=True, color='blue', alpha=0.4)
+sns.histplot(df['nlog10_Kd'], bins=20, kde=True, color='red', alpha=0.5)
+sns.histplot(df['nlog10_Kd'], bins=10, kde=True, color='green', alpha = 0.6)
 plt.title('Distribution of nlog10Kd')
 plt.xlabel('nlog10Kd')
 plt.ylabel('Frequency')
-plt.grid(True)
 plt.show()
 
 
@@ -50,59 +94,96 @@ plt.show()
 for antigen in df['antigen'].unique():
     antigen_data = df[df['antigen'] == antigen]
     plt.figure(figsize=(10, 8))
-    sns.histplot(antigen_data['nlog10_Kd'], bins=30, kde=True, alpha=0.6)
+    sns.histplot(antigen_data['nlog10_Kd'], bins=30, kde=True, color='blue', alpha=0.4)
+    sns.histplot(antigen_data['nlog10_Kd'], bins=20, kde=True, color='red', alpha=0.5)
+    sns.histplot(antigen_data['nlog10_Kd'], bins=10, kde=True, color='green', alpha=0.6)
     plt.title(f'Distribution of nlog10_Kd for {antigen}')
     plt.xlabel('nlog10_Kd')
     plt.ylabel('Frequency')
-    plt.grid(True)
     plt.show()
 
-# Box and Violin Plots for n_germline by antigen
+# Load metadata to determine germline vs mature status
+metadata = pd.read_csv('VRC01/VRC01_metadata.csv')
+germline_aa = metadata['germline_aa'].tolist()
+mature_aa = metadata['mature_aa'].tolist()
+
+# Function to classify variant as germline-like or mature-like
+def classify_variant(row):
+    site_values = [row[f'site_{i}'] for i in range(10)]
+    # Count matches to germline and mature
+    germline_matches = sum(1 for i in range(10) if site_values[i] == germline_aa[i])
+    mature_matches = sum(1 for i in range(10) if site_values[i] == mature_aa[i])
+    # Classify based on which is closer
+    if germline_matches >= mature_matches:
+        return 'Germline-like'
+    else:
+        return 'Mature-like'
+
+df['variant_type'] = df.apply(classify_variant, axis=1)
+
+# Calculate mean nlog10_Kd across replicates for each variant and antigen combination
+df_mean = df.groupby(['id', 'antigen', 'variant_type', 'n_germline']).agg({
+    'nlog10_Kd': 'mean'
+}).reset_index()
+
+#1.3d
+# Box and Violin Plots for variant type by antigen (using mean Kd across replicates)
 plt.figure(figsize=(12, 6))
-sns.boxplot(data=df, x='antigen', y='nlog10_Kd', hue='replicate')
-plt.title('Box Plots of nlog10_Kd by Antigen and Replicate')
+sns.boxplot(data=df_mean, x='antigen', y='nlog10_Kd', hue='variant_type')
+plt.title('Box Plots of Mean nlog10_Kd by Antigen and Germline/Mature Identity')
+plt.ylabel('Mean nlog10_Kd (across replicates)')
 plt.show()
 
 plt.figure(figsize=(12, 6))
-sns.violinplot(data=df, x='antigen', y='nlog10_Kd', hue='replicate', split=True)
-plt.title('Violin Plots of nlog10_Kd by Antigen and Replicate')
+sns.violinplot(data=df_mean, x='antigen', y='nlog10_Kd', hue='variant_type', split=False)
+plt.title('Violin Plots of Mean nlog10_Kd by Antigen and Germline/Mature Identity')
+plt.ylabel('Mean nlog10_Kd (across replicates)')
 plt.show()
 
-# Box and Violin Plots for n_germline vs nlog10_Kd
+#1.3e
+#Box and Violin Plots for n_germline vs nlog10_Kd
 plt.figure(figsize=(12, 8))
-sns.boxplot(data=df, x='n_germline', y='nlog10_Kd', hue='antigen', dodge=True)
-plt.title('Box Plot of nlog10_Kd by Number of Germline Residues')
+sns.boxplot(data=df_mean, x='n_germline', y='nlog10_Kd', hue='antigen', dodge=True)
+plt.title('Box Plot of Mean nlog10_Kd by Number of Germline Residues')
 plt.xlabel('Number of Germline Residues')
-plt.ylabel('nlog10_Kd')
-plt.grid(True)
+plt.ylabel('Mean nlog10_Kd (across replicates)')
 plt.show()
 
 plt.figure(figsize=(12, 8))
-sns.violinplot(data=df, x='n_germline', y='nlog10_Kd', hue='antigen', split=True)
-plt.title('Violin Plot of nlog10_Kd by Number of Germline Residues')
+sns.violinplot(data=df_mean, x='n_germline', y='nlog10_Kd', hue='antigen', split=True)
+plt.title('Violin Plot of Mean nlog10_Kd by Number of Germline Residues')
 plt.xlabel('Number of Germline Residues')
-plt.ylabel('nlog10_Kd')
-plt.grid(True)
+plt.ylabel('Mean nlog10_Kd (across replicates)')
 plt.show()
 
-# Scatter plot for SF162 vs CH505TF by replicate
-df_rep1_sf162 = df[(df['antigen'] == 'SF162') & (df['replicate'] == 1)].copy()
-df_rep1_ch505 = df[(df['antigen'] == 'CH505TF') & (df['replicate'] == 1)].copy()
+#1.3f
+# Scatter plot for SF162 vs CH505TF using mean nlog10_Kd across replicates
+df_sf162_mean = df_mean[df_mean['antigen'] == 'SF162'][['id', 'nlog10_Kd', 'n_germline']].rename(
+    columns={'nlog10_Kd': 'nlog10_Kd_SF162'}
+)
+df_ch505_mean = df_mean[df_mean['antigen'] == 'CH505TF'][['id', 'nlog10_Kd']].rename(
+    columns={'nlog10_Kd': 'nlog10_Kd_CH505TF'}
+)
 
-if len(df_rep1_sf162) > 0 and len(df_rep1_ch505) > 0:
-    # Align by id for comparison
-    merged = pd.merge(df_rep1_sf162[['id', 'nlog10_Kd', 'n_germline']], 
-                      df_rep1_ch505[['id', 'nlog10_Kd']], 
-                      on='id', suffixes=('_SF162', '_CH505'))
+if len(df_sf162_mean) > 0 and len(df_ch505_mean) > 0:
+    merged = pd.merge(df_sf162_mean, df_ch505_mean, on='id', how='inner')
     if len(merged) > 0:
         plt.figure(figsize=(10, 8))
-        sns.scatterplot(data=merged, x='nlog10_Kd_SF162', y='nlog10_Kd_CH505', hue='n_germline', palette='viridis', alpha=0.6)
-        plt.title('Scatter Plot of nlog10_Kd: SF162 vs CH505TF (Replicate 1)')
-        plt.xlabel('nlog10_Kd SF162')
-        plt.ylabel('nlog10_Kd CH505TF')
+        sns.scatterplot(
+            data=merged,
+            x='nlog10_Kd_SF162',
+            y='nlog10_Kd_CH505TF',
+            hue='n_germline',
+            palette='viridis',
+            alpha=0.6
+        )
+        plt.title('Scatter Plot of Mean nlog10_Kd: SF162 vs CH505TF')
+        plt.xlabel('Mean nlog10_Kd for SF162 (across replicates)')
+        plt.ylabel('Mean nlog10_Kd for CH505TF (across replicates)')
         plt.grid(True)
         plt.show()
 
+#1.4
 # Summary statistics for nlog10_Kd
 summary_stats = df['nlog10_Kd'].describe()
 
@@ -120,8 +201,11 @@ print(f'IQR nlog10_Kd: {q3_kd - q1_kd}')
 
 # Summary statistics by antigen
 summary_by_antigen = df.groupby('antigen')['nlog10_Kd'].describe()
+print('Summary Statistics by Antigen:')
+print(summary_by_antigen)
 
-# Data Quality Check
+
+#1.5
 # Check for missing data
 missing_data = df.isnull().sum()
 print('Missing Data Count:')
@@ -143,4 +227,117 @@ print(f'Outliers Count: {outliers.shape[0]}')
 # Check for potential data duplication
 duplicates = df[df.duplicated()]
 print(f'Duplicates Count: {duplicates.shape[0]}')
+
+#2.0 
+# Use replicate-averaged values and align by antigen
+sf162_for_test = df_mean[df_mean['antigen'] == 'SF162'][['id', 'nlog10_Kd', 'n_germline']].rename(
+    columns={'nlog10_Kd': 'nlog10_Kd_SF162'}
+)
+ch505_for_test = df_mean[df_mean['antigen'] == 'CH505TF'][['id', 'nlog10_Kd']].rename(
+    columns={'nlog10_Kd': 'nlog10_Kd_CH505TF'}
+)
+
+perm_df = pd.merge(sf162_for_test, ch505_for_test, on='id', how='inner')
+
+
+x = perm_df['nlog10_Kd_SF162'].to_numpy()
+y = perm_df['nlog10_Kd_CH505TF'].to_numpy()
+
+print('\n=== Mean difference test between antigens ===')
+print('H0: no mean difference in binding affinity between antigens.')
+print('H1: there is a mean difference in binding affinity between antigens.')
+
+def mean_diff_stat(a, b):
+    return np.mean(a) - np.mean(b)
+
+observed_mean_diff = mean_diff_stat(x, y)
+mean_diff_perm = stats.permutation_test(
+    data=(x,y),
+    statistic=mean_diff_stat,
+    permutation_type='samples',
+    n_resamples=10000,
+    alternative='two-sided',
+    random_state=50
+)
+
+plt.figure(figsize=(10, 6))
+plt.hist(mean_diff_perm.null_distribution, bins=50, color='steelblue', alpha=0.75, edgecolor='black')
+plt.axvline(observed_mean_diff, color='red', linestyle='--', linewidth=2,
+            label=f'Observed difference = {observed_mean_diff:.4f}')
+plt.title('Null Distribution (Permutation): Mean Difference\nSF162 - CH505TF')
+plt.xlabel('Difference of means (mean nlog10_Kd)')
+plt.ylabel('Count')
+plt.legend()
+plt.show()
+
+print(f'Observed effect size (SF162 - CH505TF): {observed_mean_diff:.4f}')
+print(f'Permutation p-value: {mean_diff_perm.pvalue:.4e}')
+if mean_diff_perm.pvalue < 0.05:
+    direction = 'higher' if observed_mean_diff > 0 else 'lower'
+    print(f'Interpretation: reject H0. Mean -log10KD for SF162 is {direction} than CH505TF.')
+else:
+    print('Interpretation: fail to reject H0. No strong evidence of a mean difference between antigens.')
+
+print('\n=== Correlation tests between antigens ===')
+print('H0: no correlation between binding to the two antigens.')
+print('H1: there is a correlation between binding to the two antigens.')
+print('Test setup: paired (same variants) and two-tailed permutation tests.')
+
+observed_pearson = stats.pearsonr(x, y)[0]
+observed_spearman = stats.spearmanr(x, y)[0]
+
+pearson_perm = stats.permutation_test(
+    data=(x, y),
+    statistic=lambda a, b: stats.pearsonr(a, b)[0],
+    permutation_type='pairings',
+    n_resamples=10000,
+    alternative='two-sided',
+    random_state=50
+)
+
+spearman_perm = stats.permutation_test(
+    data=(x, y),
+    statistic=lambda a, b: stats.spearmanr(a, b)[0],
+    permutation_type='pairings',
+    n_resamples=10000,
+    alternative='two-sided',
+    random_state=50
+)
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+axes[0].hist(pearson_perm.null_distribution, bins=50, color='mediumpurple', alpha=0.75, edgecolor='black')
+axes[0].axvline(observed_pearson, color='red', linestyle='--', linewidth=2,
+                label=f'Observed Pearson r = {observed_pearson:.4f}')
+axes[0].set_title('Null Distribution (Permutation): Pearson r')
+axes[0].set_xlabel('Pearson r')
+axes[0].set_ylabel('Count')
+axes[0].legend()
+
+axes[1].hist(spearman_perm.null_distribution, bins=50, color='teal', alpha=0.75, edgecolor='black')
+axes[1].axvline(observed_spearman, color='red', linestyle='--', linewidth=2,
+                label=f'Observed Spearman ρ = {observed_spearman:.4f}')
+axes[1].set_title('Null Distribution (Permutation): Spearman ρ')
+axes[1].set_xlabel('Spearman ρ')
+axes[1].set_ylabel('Count')
+axes[1].legend()
+
+plt.tight_layout()
+plt.show()
+
+print(f'Observed Pearson r: {observed_pearson:.4f}')
+print(f'Pearson permutation p-value: {pearson_perm.pvalue:.4e}')
+if pearson_perm.pvalue < 0.05:
+    print('Interpretation (Pearson): reject H0. Evidence of a linear correlation between antigens.')
+else:
+    print('Interpretation (Pearson): fail to reject H0. No strong evidence of a linear correlation.')
+
+print(f'Observed Spearman ρ: {observed_spearman:.4f}')
+print(f'Spearman permutation p-value: {spearman_perm.pvalue:.4e}')
+if spearman_perm.pvalue < 0.05:
+    print('Interpretation (Spearman): reject H0. Evidence of a monotonic correlation between antigens.')
+else:
+    print('Interpretation (Spearman): fail to reject H0. No strong evidence of a monotonic correlation.')
+
+
 # %%
