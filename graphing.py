@@ -63,7 +63,7 @@ for antigen in df['antigen'].unique():
     # Compute correlations for each antigen
     corr_data_r1 = antigen_pivot['replicate_1'].dropna()
     corr_data_r2 = antigen_pivot['replicate_2'].dropna()
-    # Keep only overlapping indices
+    # Keep only overlapping indices to ensure that we are comparing the same variants
     overlap_idx = corr_data_r1.index.intersection(corr_data_r2.index)
     if len(overlap_idx) > 1:
         pearson_corr_antigen, pearson_p_antigen = stats.pearsonr(corr_data_r1[overlap_idx], corr_data_r2[overlap_idx])
@@ -165,23 +165,21 @@ df_ch505_mean = df_mean[df_mean['antigen'] == 'CH505TF'][['id', 'nlog10_Kd']].re
     columns={'nlog10_Kd': 'nlog10_Kd_CH505TF'}
 )
 
-if len(df_sf162_mean) > 0 and len(df_ch505_mean) > 0:
-    merged = pd.merge(df_sf162_mean, df_ch505_mean, on='id', how='inner')
-    if len(merged) > 0:
-        plt.figure(figsize=(10, 8))
-        sns.scatterplot(
-            data=merged,
-            x='nlog10_Kd_SF162',
-            y='nlog10_Kd_CH505TF',
-            hue='n_germline',
-            palette='viridis',
-            alpha=0.6
-        )
-        plt.title('Scatter Plot of Mean nlog10_Kd: SF162 vs CH505TF')
-        plt.xlabel('Mean nlog10_Kd for SF162 (across replicates)')
-        plt.ylabel('Mean nlog10_Kd for CH505TF (across replicates)')
-        plt.grid(True)
-        plt.show()
+merged = pd.merge(df_sf162_mean, df_ch505_mean, on='id', how='inner')
+plt.figure(figsize=(10, 8))
+sns.scatterplot(
+    data=merged,
+    x='nlog10_Kd_SF162',
+    y='nlog10_Kd_CH505TF',
+    hue='n_germline',
+    palette='viridis',
+    alpha=0.6
+)
+plt.title('Scatter Plot of Mean nlog10_Kd: SF162 vs CH505TF')
+plt.xlabel('Mean nlog10_Kd for SF162 (across replicates)')
+plt.ylabel('Mean nlog10_Kd for CH505TF (across replicates)')
+plt.grid(True)
+plt.show()
 
 #1.4
 # Summary statistics for nlog10_Kd
