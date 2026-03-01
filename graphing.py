@@ -241,9 +241,6 @@ perm_df = pd.merge(sf162_for_test, ch505_for_test, on='id', how='inner')
 x = perm_df['nlog10_Kd_SF162'].to_numpy()
 y = perm_df['nlog10_Kd_CH505TF'].to_numpy()
 
-print('\n=== Mean difference test between antigens ===')
-print('H0: no mean difference in binding affinity between antigens.')
-print('H1: there is a mean difference in binding affinity between antigens.')
 
 def mean_diff_stat(a, b):
     return np.mean(a) - np.mean(b)
@@ -259,7 +256,7 @@ mean_diff_perm = stats.permutation_test(
 )
 
 plt.figure(figsize=(10, 6))
-plt.hist(mean_diff_perm.null_distribution, bins=50, color='steelblue', alpha=0.75, edgecolor='black')
+plt.hist(mean_diff_perm.null_distribution, bins=50, color='blue', alpha=0.75, edgecolor='black')
 plt.axvline(observed_mean_diff, color='red', linestyle='--', linewidth=2,
             label=f'Observed difference = {observed_mean_diff:.4f}')
 plt.title('Null Distribution (Permutation): Mean Difference\nSF162 - CH505TF')
@@ -276,10 +273,6 @@ if mean_diff_perm.pvalue < 0.05:
 else:
     print('Interpretation: fail to reject H0. No strong evidence of a mean difference between antigens.')
 
-print('\n=== Correlation tests between antigens ===')
-print('H0: no correlation between binding to the two antigens.')
-print('H1: there is a correlation between binding to the two antigens.')
-print('Test setup: paired (same variants) and two-tailed permutation tests.')
 
 observed_pearson = stats.pearsonr(x, y)[0]
 observed_spearman = stats.spearmanr(x, y)[0]
@@ -304,7 +297,7 @@ spearman_perm = stats.permutation_test(
 
 fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
-axes[0].hist(pearson_perm.null_distribution, bins=50, color='mediumpurple', alpha=0.75, edgecolor='black')
+axes[0].hist(pearson_perm.null_distribution, bins=50, color='purple', alpha=0.75, edgecolor='black')
 axes[0].axvline(observed_pearson, color='red', linestyle='--', linewidth=2,
                 label=f'Observed Pearson r = {observed_pearson:.4f}')
 axes[0].set_title('Null Distribution (Permutation): Pearson r')
@@ -312,7 +305,7 @@ axes[0].set_xlabel('Pearson r')
 axes[0].set_ylabel('Count')
 axes[0].legend()
 
-axes[1].hist(spearman_perm.null_distribution, bins=50, color='teal', alpha=0.75, edgecolor='black')
+axes[1].hist(spearman_perm.null_distribution, bins=50, color='green', alpha=0.75, edgecolor='black')
 axes[1].axvline(observed_spearman, color='red', linestyle='--', linewidth=2,
                 label=f'Observed Spearman ρ = {observed_spearman:.4f}')
 axes[1].set_title('Null Distribution (Permutation): Spearman ρ')
