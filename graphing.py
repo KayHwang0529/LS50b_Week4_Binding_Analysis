@@ -259,7 +259,7 @@ plt.figure(figsize=(10, 6))
 plt.hist(mean_diff_perm.null_distribution, bins=50, color='blue', alpha=0.75, edgecolor='black')
 plt.axvline(observed_mean_diff, color='red', linestyle='--', linewidth=2,
             label=f'Observed difference = {observed_mean_diff:.4f}')
-plt.title('Null Distribution (Permutation): Mean Difference\nSF162 - CH505TF')
+plt.title('Null Distribution (Permutation): Mean Difference')
 plt.xlabel('Difference of means (mean nlog10_Kd)')
 plt.ylabel('Count')
 plt.legend()
@@ -319,16 +319,16 @@ plt.show()
 print(f'Observed Pearson r: {observed_pearson:.4f}')
 print(f'Pearson permutation p-value: {pearson_perm.pvalue:.4e}')
 if pearson_perm.pvalue < 0.05:
-    print('Interpretation (Pearson): reject H0. Evidence of a linear correlation between antigens.')
+    print('Interpretation (Pearson): reject H0.')
 else:
-    print('Interpretation (Pearson): fail to reject H0. No strong evidence of a linear correlation.')
+    print('Interpretation (Pearson): fail to reject H0.')
 
 print(f'Observed Spearman ρ: {observed_spearman:.4f}')
 print(f'Spearman permutation p-value: {spearman_perm.pvalue:.4e}')
 if spearman_perm.pvalue < 0.05:
-    print('Interpretation (Spearman): reject H0. Evidence of a monotonic correlation between antigens.')
+    print('Interpretation (Spearman): reject H0.')
 else:
-    print('Interpretation (Spearman): fail to reject H0. No strong evidence of a monotonic correlation.')
+    print('Interpretation (Spearman): fail to reject H0.')
 
 
 # %%
