@@ -29,6 +29,11 @@ plt.xlabel('nlog10Kd Replicate 1')
 plt.ylabel('nlog10Kd Replicate 2')
 plt.show()
 
+# INTERPRETATION for Scatter Plot of nlog10Kd: Replicate 1 vs Replicate 2
+# Most points lie close to the 1:1 line, indicating that the replicates generally agree with each other.
+# There are a few outliers, and this could possibly represent noise.
+
+
 # Compute Pearson and Spearman correlation coefficients
 pearson_corr, pearson_p = stats.pearsonr(df_pivot['replicate_1'].dropna(), df_pivot['replicate_2'].dropna())
 spearman_corr, spearman_p = stats.spearmanr(df_pivot['replicate_1'].dropna(), df_pivot['replicate_2'].dropna())
@@ -78,6 +83,12 @@ spearman_corr, spearman_p = stats.spearmanr(df_pivot['replicate_1'].dropna(), df
 print(f'Overall Pearson correlation: {pearson_corr:.4f}, p-value: {pearson_p:.2e}')
 print(f'Overall Spearman correlation: {spearman_corr:.4f}, p-value: {spearman_p:.2e}')
 
+# INTERPRETATION for Scatter Plot of nlog10Kd: Replicate 1 vs Replicate 2 (CH505TF)
+# CH505TF points are generally more widely distributed and not as tightly-clustered around the 1:1 line, suggesting more variability between replicate 1 and replicate 2's measurements.
+
+# INTERPRETATION for Scatter Plot of nlog10Kd: Replicate 1 vs Replicate 2 (SF162)
+# SF162 points are generally more tightly clustered, indicating good agreement between replicate 1 and replicate 2's measurements.
+
 #1.3c
 # Histograms of nlog10Kd
 plt.figure(figsize=(10, 8))
@@ -89,6 +100,9 @@ plt.xlabel('nlog10Kd')
 plt.ylabel('Frequency')
 plt.show()
 
+# INTERPRETATION for Distribution of nlog10Kd
+# nlog10Kd values are generally unimodal and centered around a value of 7.0.
+# There's a slight right tail, which represents binders with a higher relative affinity.
 
 # Separate data by antigen
 for antigen in df['antigen'].unique():
@@ -101,6 +115,15 @@ for antigen in df['antigen'].unique():
     plt.xlabel('nlog10_Kd')
     plt.ylabel('Frequency')
     plt.show()
+
+# INTERPRETATION for Distribution of nlog10_Kd for CH505TF
+# nlog10_Kd distribution is wider and centered around lower values, indicating more variability and weaker binding affinity in general.
+# The distribution is weighted towards the left, which suggests that there might be a lot of variants with weak binding capabilities.
+
+# INTERPRETATION for Distribution of nlog10_Kd for SF162
+# nlog10_Kd distribution is tighter and centered around 7.0-7.4, indicating consistent and a relatively stronger binding affinity.
+# There is a bit of a right tail with suggests that very few variants reach an even higher binding affinity beyond the distribution peak nlog10_Kd value.
+
 
 # Load metadata to determine germline vs mature status
 metadata = pd.read_csv('VRC01/VRC01_metadata.csv')
@@ -134,11 +157,21 @@ plt.title('Box Plots of Mean nlog10_Kd by Antigen and Germline/Mature Identity')
 plt.ylabel('Mean nlog10_Kd (across replicates)')
 plt.show()
 
+# INTERPRETATION for Box Plots of Mean nlog10_Kd by Antigen and Germline/Mature Identity
+# Mature-like variants have a slightly higher median of nlog10_Kd for both CH505TF and SF162, suggesting that binding generally improves after maturation.
+# SF162 variants generally have a higher binding affinity than CH505TF variants.
+
+
 plt.figure(figsize=(12, 6))
 sns.violinplot(data=df_mean, x='antigen', y='nlog10_Kd', hue='variant_type', split=False)
 plt.title('Violin Plots of Mean nlog10_Kd by Antigen and Germline/Mature Identity')
 plt.ylabel('Mean nlog10_Kd (across replicates)')
 plt.show()
+
+# INTERPRETATION for Violin Plots of Mean nlog10_Kd by Antigen and Germline/Mature Identity
+# Mature-like variants generally have slightly higher binding affinities than germline-like variants, suggesting that binding generally improves after maturation.
+# For both antigen types, individual variants vary substantially in terms of binding affinity regardless if mature-like or germ-like.
+
 
 #1.3e
 #Box and Violin Plots for n_germline vs nlog10_Kd
@@ -149,12 +182,22 @@ plt.xlabel('Number of Germline Residues')
 plt.ylabel('Mean nlog10_Kd (across replicates)')
 plt.show()
 
+# INTERPRETATION for Box Plot of Mean nlog10_Kd by Number of Germline Residues
+# Variants with 11 germline residues generally have high median average nlog10_Kd values compared to those with 12/13 germline residues, demonstrating how more mutated antibodies might display better binding.
+# SF162 has higher median values than CH505TF, indicating that there is generally always an advantage to binding to SF162 across varying levels of germline residues.
+
+
 plt.figure(figsize=(12, 8))
 sns.violinplot(data=df_mean, x='n_germline', y='nlog10_Kd', hue='antigen', split=True)
 plt.title('Violin Plot of Mean nlog10_Kd by Number of Germline Residues')
 plt.xlabel('Number of Germline Residues')
 plt.ylabel('Mean nlog10_Kd (across replicates)')
 plt.show()
+
+# INTERPRETATION for Violin Plot of Mean nlog10_Kd by Number of Germline Residues
+# Antibodies with the same number of germline residues still vary substantially in binding affinity (wide vertical spread).
+# SF162 parts of the violin plots are consistently higher relative to the CH505TF plots, suggesting that SF162 is generally bound more strongly across varying levels of germline residues.
+
 
 #1.3f
 # Scatter plot for SF162 vs CH505TF using mean nlog10_Kd across replicates
@@ -180,6 +223,11 @@ plt.xlabel('Mean nlog10_Kd for SF162 (across replicates)')
 plt.ylabel('Mean nlog10_Kd for CH505TF (across replicates)')
 plt.grid(True)
 plt.show()
+
+# INTERPRETATION FOR Scatter Plot of Mean nlog10_Kd: SF162 vs CH505TF
+# There is a clear upward-slope of data points, suggesting a positive relationship between average nlog10Kd values across CH505TF and SF162 variants.
+# Germline content influences binding affinity, but colored data points show no clear pattern, suggesting that germline content doesn't create preferences for one antigen over the other.
+
 
 #1.4
 # Summary statistics for nlog10_Kd
