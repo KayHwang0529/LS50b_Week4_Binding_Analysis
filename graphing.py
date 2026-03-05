@@ -405,7 +405,9 @@ print(important_df.sort_values('difference')) # from this can see that sites 7 a
 # Additionally, sites 6, 8 and 9 show significant positive differences.
 # This means that mutations at these sites generally increase -logKd.
 
-# analysis #2: epistasis between two sites of interest
+# analysis #2: epistasis between two sites of interest (4 and 7)
+
+
 
 # analysis #3: how number of G/M sites affects correlations between SF162 and CH505TF
 correlations = []
