@@ -406,6 +406,68 @@ print(important_df.sort_values('difference')) # from this can see that sites 7 a
 
 # analysis #2: epistasis between two sites of interest (4 and 7)
 
+epistasis_rows = []
+
+for antigen in df['antigen'].unique():
+    subset = df[df['antigen'] == antigen].copy()
+    
+    site4_germline = subset['site_4'].mode().iloc[0]
+    site7_germline = subset['site_7'].mode().iloc[0]
+
+    subset['site4_state'] = np.where(subset['site_4'] == site4_germline, 'G', 'M')
+    subset['site7_state'] = np.where(subset['site_7'] == site7_germline, 'G', 'M')
+    subset['genotype_47'] = subset['site4_state'] + subset['site7_state']  # GG, GM, MG, MM
+
+    genotype_summary = (
+        subset.groupby('genotype_47')['nlog10_Kd']
+        .agg(mean='mean', sem='sem', n='count')
+        .reset_index()
+    )
+    genotype_summary['antigen'] = antigen
+    epistasis_rows.append(genotype_summary)
+
+epistasis_df = pd.concat(epistasis_rows, ignore_index=True)
+
+fig, axes = plt.subplots(1, 2, figsize=(13, 5), sharey=True)
+
+for ax, antigen in zip(axes, df['antigen'].unique()):
+    subset = df[df['antigen'] == antigen].copy()
+    site4_germline = subset['site_4'].mode().iloc[0]
+    site7_germline = subset['site_7'].mode().iloc[0]
+
+    subset['site4_state'] = np.where(subset['site_4'] == site4_germline, 'G', 'M')
+    subset['site7_state'] = np.where(subset['site_7'] == site7_germline, 'G', 'M')
+
+    interaction_df = (
+        subset.groupby(['site4_state', 'site7_state'])['nlog10_Kd']
+        .mean()
+        .reset_index()
+    )
+
+    sns.lineplot(
+        data=interaction_df,
+        x='site4_state',
+        y='nlog10_Kd',
+        hue='site7_state',
+        marker='o',
+        ax=ax,
+        hue_order=['G', 'M']
+    )
+
+    ax.set_title(f'Interaction plot ({antigen})')
+    ax.set_xlabel('Site 4 state')
+    ax.set_ylabel('Mean nlog10_Kd')
+    ax.legend(title='Site 7 state')
+
+plt.tight_layout()
+plt.show()
+
+# INTERPRETATION for Epistasis at sites 4 and 7
+# If the two lines in the interaction plot are non-parallel, that indicates epistasis:
+# the effect of mutating site 4 depends on whether site 7 is G or M (and vice versa).
+# Since the two lines are parallel, this suggests that there is no epistasis between sites 4 and 7, 
+# and that the effects of mutations at these two sites are independent of each other.
+
 
 
 # analysis #3: how number of G/M sites affects correlations between SF162 and CH505TF
