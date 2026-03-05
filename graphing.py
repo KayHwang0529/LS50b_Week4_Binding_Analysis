@@ -6,9 +6,9 @@ import pandas as pd
 from scipy import stats
 
 #1.2
-# Load dataå
+# Load data
 df = pd.read_csv('VRC01/VRC01_kds.csv')
-print(df.head())  # Display the first few rows of the dataframe to verify loading
+print(df.head())  
 
 # Compute number of germline residues
 df['n_germline'] = df['vh_aa'].apply(lambda x: x.count('G'))
