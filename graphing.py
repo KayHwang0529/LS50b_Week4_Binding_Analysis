@@ -380,7 +380,7 @@ else:
 
 # PART 3
 
-# analysis #1: epistasis between two sites of interest
+# analysis #1: identifying sites that influencing binding affinity the most
 important_sites = []
 for site in range(10):
     column = f'site_{site}'
@@ -389,18 +389,25 @@ for site in range(10):
 
         g_aa = unique_antigen[column].mode().iloc[0] # most frequent location for the double A germline
 
-        g_vals = unique_antigen[unique_antigen[column] == g_aa['nlog10_Kd']]
-        m_vals = unique_antigen[unique_antigen[column] != g_aa['nlog10_Kd']]
+        g_vals = unique_antigen[unique_antigen[column] == g_aa]['nlog10_Kd']
+        m_vals = unique_antigen[unique_antigen[column] != g_aa]['nlog10_Kd']
         if len(m_vals) < 20 or len(g_vals) < 20: # makes sure there's enough mutants
             continue
 
         difference = m_vals.mean() - g_vals.mean() # average change of affinity for each site
         important_sites.append({'site': site, 'antigen': antigen, 'mean_g': g_vals.mean(), 'mean_m': m_vals.mean(), 'difference': difference})
 important_df = pd.DataFrame(important_sites)
-print(important_df.sort_values('difference'))
+print(important_df.sort_values('difference')) # from this can see that sites 7 and 4 have largest negative differences, sites
 
+# INTERPRETATION
+# Comparing the mean -logKd values for G/M sequences for each antigen show that mutations at sites 4 and 7 result in the greatest differences in affinity for both antigen types.
+# This suggests that sites 4 and 7 are crucial for maintaining strong binding affinities for the antibodies because mutating them results in weaker binding affinities.
+# Additionally, sites 6, 8 and 9 show significant positive differences.
+# This means that mutations at these sites generally increase -logKd.
 
-# analysis #2: how number of G/M sites affects correlations between SF162 and CH505TF
+# analysis #2: epistasis between two sites of interest
+
+# analysis #3: how number of G/M sites affects correlations between SF162 and CH505TF
 correlations = []
 
 for count_g_sites in sorted(merged['n_germline'].unique()):
@@ -421,8 +428,6 @@ plt.show()
 # INTERPRETATION for Correlation between SF162 and CH505TF versus antigen maturation level
 # Across all maturation levels, SF162 and CH505TF are strongly correlated (Pearson r ranges from around 0.7 to 0.8), which suggests that variants that bind to one antigen generally bind strongly to the other antigen.
 # As antibodies have more germline residues, the correlation value decreases slightly. This suggests that germline variants may display more antigen-specific variation.
-
-# analysis #3:
 
 # four panels
 
