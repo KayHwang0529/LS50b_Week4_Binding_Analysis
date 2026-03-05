@@ -39,7 +39,6 @@ pearson_corr, pearson_p = stats.pearsonr(df_pivot['replicate_1'].dropna(), df_pi
 spearman_corr, spearman_p = stats.spearmanr(df_pivot['replicate_1'].dropna(), df_pivot['replicate_2'].dropna())
 
 # Replicate-replicate plots for each antigen with consistent axis ranges
-# Calculate global min and max across all antigens for consistent axis ranges
 all_replicate_values = []
 for antigen in df['antigen'].unique():
     antigen_data = df[df['antigen'] == antigen]
