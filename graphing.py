@@ -466,7 +466,8 @@ plt.show()
 # If the two lines in the interaction plot are non-parallel, that indicates epistasis:
 # the effect of mutating site 4 depends on whether site 7 is G or M (and vice versa).
 # Since the two lines are parallel, this suggests that there is no epistasis between sites 4 and 7, 
-# and that the effects of mutations at these two sites are independent of each other.
+# and that the effects of mutations at these two sites are independent of each other
+# and have an additive relationship rather than an epistatic one.
 
 
 
@@ -493,5 +494,43 @@ plt.show()
 # As antibodies have more germline residues, the correlation value decreases slightly. This suggests that germline variants may display more antigen-specific variation.
 
 # four panels
+fig, axes = plt.subplots(2, 2)
+ax1 = axes[0, 0]
+ax2 = axes[0, 1]
+ax3 = axes[1, 0]
+ax4 = axes[1, 1]
+
+# histogram of mean -logKd for SF162 and CH505TF
+sns.histplot(df_mean, x='nlog10_Kd', hue='antigen', bins=25, ax=ax1)
+ax1.set_xlabel('Mean -logKd')
+ax1.set_ylabel('Count')
+ax1.set_title('A. Distribution of mean -logKd for SF162 and CH505TF')
+
+# box plot of mean -logKd vs number of germline sites for SF162 and CH505TF
+sns.boxplot(df_mean, x='n_germline', y='nlog10_Kd', hue='antigen', ax=ax2)
+ax2.set_xlabel('Number of germline residue sites')
+ax2.set_ylabel('Mean -logKd')
+ax2.set_title('B. Mean -logKd vs number of germline residue sites for SF162 and CH505TF')
+
+# scatter plot for SF162 and CH505TF variants sorted by number of germline residue sites
+sns.scatterplot(merged, x='nlog10_Kd_SF162', y='nlog10_Kd_CH505TF', hue='n_germline', ax=ax3)
+ax3.set_xlabel('Mean -logKd for SF162')
+ax3.set_ylabel('Mean -logKd for CH505TF')
+ax3.set_title('C. Mean -logKd of SF162 vs CH505TF')
+
+# how correlations between antigens are affected by number of germline residue sites
+sns.barplot(correlations_df, x='n_germline', y='pearson_r', ax=ax4)
+ax4.set_xlabel('Number of germline residue sites')
+ax4.set_ylabel('Pearson r correlation coefficient value')
+ax4.set_title('D. Correlation of SF162 and CH505TF versus number of germline residue sites')
+
+plt.tight_layout()
+plt.show()
+
+# (A) SF162 generally has a higher -logKd value than CH505TF, suggesting it generally has a higher binding affinity.
+# (B) Mean -logKd increases when there are more M sites, which is consistent with affinity maturation and how more matured variants are highly-specific and generally are selected for higher binding affinities.
+# (C) Mean -logKd values for both antigen types are positive correlated across germline variants. This suggests that many mutations may work together to enhance antigen binding.
+# (D) With additional mutations, a given variant has similar binding properties/affinities to both antigen types.
+
 
 # %%
