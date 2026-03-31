@@ -27,15 +27,8 @@ for antigen in antigens:
     sns.heatmap(data_hm, xticklabels=sites, yticklabels=sites)
     plt.title(f'Average affinity for {antigen} pairwise mutation')
     plt.show()
-<<<<<<< HEAD
     
     
-#epistasis differs between SF162 and CH505TF: scatter plot to compare interaction strength (with each antigen on an axis)
-
-
-#higher order epistatsis (3)
-
-=======
 # most notably between sites 4 and 7
 
 # mutation count vs. affinity
@@ -55,4 +48,9 @@ plt.show()
 # could be a fitness valley? maybe CH505TF makes 2 mutations at once to skip the valley
 # more difficult to get to 2 mutations than just 1
 # CH505TF steeper slope between 2-6 mutations --> each additional mutation = more binding power compared to SF162
->>>>>>> 625be3895a8b983be97cb99b15d8ad1f0a7059ab
+
+    
+#epistasis differs between SF162 and CH505TF: scatter plot to compare interaction strength (with each antigen on an axis)
+
+
+#higher order epistatsis (3)
