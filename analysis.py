@@ -26,3 +26,10 @@ for antigen in antigens:
     sns.heatmap(data_hm, xticklabels=sites, yticklabels=sites)
     plt.title(f'Average affinity for {antigen} pairwise mutation')
     plt.show()
+    
+    
+#epistasis differs between SF162 and CH505TF: scatter plot to compare interaction strength (with each antigen on an axis)
+
+
+#higher order epistatsis (3)
+
