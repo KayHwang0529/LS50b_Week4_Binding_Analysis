@@ -137,3 +137,36 @@ plt.show()
 # this further explains the fitness valleys in CH505TF and the more rugged landscape, as some mutations may have strong positive interactions while others have strong negative interactions
 
 #higher order epistatsis (3)
+
+
+
+
+
+
+# lab meeting 3
+
+# for epistasis plot, want to see exactly which sites work with which sites to see the most positive and negative relationships
+plt.figure(figsize=(8, 8))
+colors = {'SF162': '#1f77b4', 'CH505TF': '#ff7f0e'}
+for antigen, color in colors.items():
+    mask = interaction_df['stronger_antigen'] == antigen
+    plt.scatter(interaction_df[mask]['sf162'], interaction_df[mask]['ch505tf'], 
+                s=100, alpha=0.6, label=antigen, color=color)
+
+plt.plot([min_val, max_val], [min_val, max_val], 'k--', alpha=0.3)
+
+plt.xlabel('Epistasis (SF162 interaction strength)')
+plt.ylabel('Epistasis (CH505TF interaction strength)')
+plt.title('Epistatic interactions differ between SF162 and CH505TF (labeled sites with |epistasis coeff| > 0.05)')
+plt.axhline(y=0, color='k', linestyle='-', linewidth=0.5, alpha=0.3)
+plt.axvline(x=0, color='k', linestyle='-', linewidth=0.5, alpha=0.3)
+plt.grid(True, alpha=0.3)
+plt.legend(title='Stronger epistasis', loc='upper left')
+# added below from above code (last week) to label the site relationships
+for i, row in interaction_df.iterrows():
+    if abs(row['sf162']) > 0.05 and abs(row['ch505tf']) > 0.05: # picked this cutoff based on graph to select outliers
+        plt.annotate(row['sites'], (row['sf162'], row['ch505tf']))
+plt.show()
+
+# want a plot to compare sf162 vs ch505tf affinity to analyze broadness, not just how th
+
