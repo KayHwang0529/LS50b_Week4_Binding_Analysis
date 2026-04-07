@@ -166,6 +166,8 @@ plt.legend(title='Stronger epistasis', loc='upper left')
 for i, row in interaction_df.iterrows():
     if abs(row['sf162']) > 0.05 and abs(row['ch505tf']) > 0.05: # picked this cutoff based on graph to select outliers
         plt.annotate(row['sites'], (row['sf162'], row['ch505tf']))
+    elif abs(row['sf162'] - row['ch505tf']) > 0.08: # looks at trade-offs when two sites work together in terms of synergistic for one antigen but not for the other
+        plt.annotate(row['sites'], (row['sf162'], row['ch505tf']))
 plt.show()
 
 # want a plot to compare sf162 vs ch505tf affinity to analyze broadness, not just how th
