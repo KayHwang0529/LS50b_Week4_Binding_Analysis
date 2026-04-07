@@ -52,7 +52,7 @@ plt.show()
     
 #Epistasis differs between SF162 and CH505TF: scatter plot to compare interaction strength (extent of epistatsis)
 
-# Extract interaction strengths (epistasis) for each site pair
+# Extract interaction strengths (epistasis) for each site pair --> use tobit model (week 7)
 interaction_data = []
 
 for i in range(n_sites):
@@ -139,6 +139,7 @@ plt.show()
 #higher order epistatsis (3)
 
 
+<<<<<<< Updated upstream
 
 
 
@@ -170,3 +171,7 @@ plt.show()
 
 # want a plot to compare sf162 vs ch505tf affinity to analyze broadness, not just how th
 
+=======
+#heatmap for epistastic interactions between 2 sites (which have strong negative and positive) 
+# --> what could we hypothesis about these 2 sites, maybe they don't interact with the antigen, look at structure?
+>>>>>>> Stashed changes
