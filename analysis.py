@@ -24,8 +24,14 @@ for antigen in antigens:
         for j in range(n_sites):
             y_n_mutated = (df_antigen[sites[i]] != 'G') & (df_antigen[sites[j]] != 'G') # sees how many matured sites for each mutation
             data_hm[i, j] = df_antigen[y_n_mutated]['nlog10_Kd'].mean()
-    sns.heatmap(data_hm, xticklabels=sites, yticklabels=sites)
-    plt.title(f'Average affinity for {antigen} pairwise mutation')
+    
+    # Updated for transparency and font size
+    plt.figure(figsize=(10, 8), facecolor='none')
+    ax = sns.heatmap(data_hm, xticklabels=sites, yticklabels=sites)
+    ax.set_facecolor('none')
+    plt.title(f'Average affinity for {antigen} pairwise mutation', fontsize=16)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
     plt.show()
     
     
@@ -34,11 +40,17 @@ for antigen in antigens:
 # mutation count vs. affinity
 # are there any cutoffs of mutation #s (fitness valleys) that result in worse binding?
 df['n_mutations'] = (df[sites] != 'G').sum(axis=1)
-sns.lineplot(data=df, x='n_mutations', y='nlog10_Kd', hue='antigen')
 
-plt.xlabel('Number of mutations')
-plt.ylabel('Binding affinity (-logKd)')
-plt.title('Binding affinity vs. number of mutations for SF162 and CH505TF')
+# Updated for transparency and font size
+plt.figure(figsize=(10, 6), facecolor='none')
+sns.lineplot(data=df, x='n_mutations', y='nlog10_Kd', hue='antigen')
+plt.gca().set_facecolor('none')
+plt.xlabel('Number of mutations', fontsize=14)
+plt.ylabel('Binding affinity (-log10_Kd)', fontsize=14)
+plt.title('Binding affinity vs. number of mutations for SF162 and CH505TF', fontsize=16)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+plt.legend(fontsize=12)
 plt.show()
 # higher y-values = more fit (better binding to antigen)
 # CH505TF has to mutate/mature much more to achieve same level of binding affinity as SF162
@@ -107,25 +119,29 @@ interaction_df['stronger_antigen'] = interaction_df.apply(
 )
 
 # Scatter plot with color coding by antigen
-plt.figure(figsize=(8, 8))
+# Updated for transparency and font size
+plt.figure(figsize=(20, 20), facecolor='none')
+plt.gca().set_facecolor('none')
 colors = {'SF162': '#1f77b4', 'CH505TF': '#ff7f0e'}
 for antigen, color in colors.items():
     mask = interaction_df['stronger_antigen'] == antigen
     plt.scatter(interaction_df[mask]['sf162'], interaction_df[mask]['ch505tf'], 
-                s=100, alpha=0.6, label=antigen, color=color)
+                s=150, alpha=0.6, label=antigen, color=color)
 
 # Add diagonal line for reference
 min_val = min(interaction_df['sf162'].min(), interaction_df['ch505tf'].min())
 max_val = max(interaction_df['sf162'].max(), interaction_df['ch505tf'].max())
 plt.plot([min_val, max_val], [min_val, max_val], 'k--', alpha=0.3)
 
-plt.xlabel('Epistasis (SF162 interaction strength)')
-plt.ylabel('Epistasis (CH505TF interaction strength)')
-plt.title('Epistatic interactions differ between SF162 and CH505TF')
+plt.xlabel('Epistasis (SF162 interaction strength)', fontsize=14)
+plt.ylabel('Epistasis (CH505TF interaction strength)', fontsize=14)
+plt.title('Epistatic interactions differ between SF162 and CH505TF', fontsize=16)
 plt.axhline(y=0, color='k', linestyle='-', linewidth=0.5, alpha=0.3)
 plt.axvline(x=0, color='k', linestyle='-', linewidth=0.5, alpha=0.3)
 plt.grid(True, alpha=0.3)
-plt.legend(title='Stronger epistasis', loc='upper left')
+plt.legend(title='Stronger epistasis', loc='upper left', fontsize=12)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
 plt.show()
 
 # Findings:
@@ -143,28 +159,32 @@ plt.show()
 # lab meeting 3
 
 # for epistasis plot, want to see exactly which sites work with which sites to see the most positive and negative relationships
-plt.figure(figsize=(8, 8))
+# Updated for transparency and font size
+plt.figure(figsize=(20, 20), facecolor='none')
+plt.gca().set_facecolor('none')
 colors = {'SF162': '#1f77b4', 'CH505TF': '#ff7f0e'}
 for antigen, color in colors.items():
     mask = interaction_df['stronger_antigen'] == antigen
     plt.scatter(interaction_df[mask]['sf162'], interaction_df[mask]['ch505tf'], 
-                s=100, alpha=0.6, label=antigen, color=color)
+                s=150, alpha=0.6, label=antigen, color=color)
 
 plt.plot([min_val, max_val], [min_val, max_val], 'k--', alpha=0.3)
 
-plt.xlabel('Epistasis (SF162 interaction strength)')
-plt.ylabel('Epistasis (CH505TF interaction strength)')
-plt.title('Epistatic interactions differ between SF162 and CH505TF (labeled sites with |epistasis coeff| > 0.05)')
+plt.xlabel('Epistasis (SF162 interaction strength)', fontsize=14)
+plt.ylabel('Epistasis (CH505TF interaction strength)', fontsize=14)
+plt.title('Epistatic interactions differ between SF162 and CH505TF (labeled sites with |epistasis coeff| > 0.05)', fontsize=16)
 plt.axhline(y=0, color='k', linestyle='-', linewidth=0.5, alpha=0.3)
 plt.axvline(x=0, color='k', linestyle='-', linewidth=0.5, alpha=0.3)
 plt.grid(True, alpha=0.3)
-plt.legend(title='Stronger epistasis', loc='upper left')
+plt.legend(title='Stronger epistasis', loc='upper left', fontsize=12)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
 # added below from above code (last week) to label the site relationships
 for i, row in interaction_df.iterrows():
     if abs(row['sf162']) > 0.05 and abs(row['ch505tf']) > 0.05: # picked this cutoff based on graph to select outliers
-        plt.annotate(row['sites'], (row['sf162'], row['ch505tf']))
+        plt.annotate(row['sites'], (row['sf162'], row['ch505tf']), fontsize=11)
     elif abs(row['sf162'] - row['ch505tf']) > 0.08: # looks at trade-offs when two sites are mutated in terms of synergistic for one antigen but not for the other
-        plt.annotate(row['sites'], (row['sf162'], row['ch505tf'])) # labels ANTIGEN-SPECIFIC PAIRWISE SITES
+        plt.annotate(row['sites'], (row['sf162'], row['ch505tf']), fontsize=11) # labels ANTIGEN-SPECIFIC PAIRWISE SITES
 plt.show()
 
 
@@ -210,12 +230,17 @@ all_data = epistasis_pairs.merge(distance_df, on='sites', how='left')
 print(all_data)
 
 # PLOT IT!!
-plt.scatter(all_data['distance'], all_data['sf162'], label='SF162')
-plt.scatter(all_data['distance'], all_data['ch505tf'], label='CH505TF')
-plt.xlabel('Distance between selected site pairs (Å)')
-plt.ylabel('Pairwise epistasis coefficients between selected sites')
-plt.title('Epistasis coefficients vs distances for selected site pairs')
-plt.legend()
+# Updated for transparency and font size
+plt.figure(figsize=(10, 7), facecolor='none')
+plt.gca().set_facecolor('none')
+plt.scatter(all_data['distance'], all_data['sf162'], s=150, label='SF162')
+plt.scatter(all_data['distance'], all_data['ch505tf'], s=150, label='CH505TF')
+plt.xlabel('Distance between selected site pairs (Å)', fontsize=14)
+plt.ylabel('Pairwise epistasis coefficients between selected sites', fontsize=14)
+plt.title('Epistasis coefficients vs distances for selected site pairs', fontsize=16)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+plt.legend(fontsize=12)
 plt.show()
 
 # X-AXIS
@@ -244,3 +269,48 @@ plt.show()
 # NEXT STEPS: look at physical structures of SF162/CH505TF and their CD4 binding sites
 # research more about possible qualitative reasons to explain antigen-specific epistasis
 
+# (Distances re-load and final plot...)
+distances = pd.read_csv('/Users/katehsia/Desktop/all_distances.csv')
+print(distances)
+
+# separate csv file rows into the pairwise site distances and distances from site to gp120 residues
+pairwise_d = distances.iloc[0:4]
+gp120_pair_d = distances.iloc[4:8]
+
+# create a dictionary and turn that into a dataframe with the distances to compare with epistasis coefficients
+# note that we only care about the pairwise distances here
+distance_data = {
+    'sites': ['site_4-site_6', 'site_5-site_6', 'site_5-site_8', 'site_5-site_9'],
+    'distance': [7.0, 3.8, 9.1, 11.9]
+}
+distance_df = pd.DataFrame(distance_data)
+
+# pulling epistasis coefficients for relevant sites
+epistasis_pairs = interaction_df[interaction_df['sites'].isin(distance_data['sites'])]
+print(epistasis_pairs)
+
+# combine epistasis coefficients with distances for plotting (match w/ sites and keep coefficients on the left)
+all_data = epistasis_pairs.merge(distance_df, on='sites', how='left')
+print(all_data)
+
+# PLOT IT!!
+# Updated for transparency and font size
+plt.figure(figsize=(10, 7), facecolor='none')
+plt.gca().set_facecolor('none')
+plt.scatter(all_data['distance'], all_data['sf162'], s=150, label='SF162')
+plt.scatter(all_data['distance'], all_data['ch505tf'], s=150, label='CH505TF')
+
+# ADDING LABELS!
+for i, row in all_data.iterrows():
+    # for SF162
+    plt.annotate(row['sites'], (row['distance'], row['sf162']), fontsize=10)
+    # for CH505TF
+    plt.annotate(row['sites'], (row['distance'], row['ch505tf']), fontsize=10)
+
+plt.xlabel('Distance between selected site pairs (Å)', fontsize=14)
+plt.ylabel('Pairwise epistasis coefficients between selected sites', fontsize=14)
+plt.title('Epistasis coefficients vs distances for selected site pairs', fontsize=16)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+plt.legend(fontsize=12)
+plt.show()
